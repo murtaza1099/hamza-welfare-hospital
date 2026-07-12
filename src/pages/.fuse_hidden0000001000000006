@@ -1,0 +1,19 @@
+import { useLang } from "../context/LanguageContext";
+import { useSeo } from "../hooks/useSeo";
+import { PrimaryButton, Eyebrow } from "../components/ui";
+
+export default function NotFound() {
+  const { t, lang } = useLang();
+  const n = t.notFound;
+  useSeo(lang === "ur" ? "صفحہ نہیں ملا — حمزہ ویلفیئر ہسپتال" : "Page not found — Hamza Welfare Hospital");
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto flex max-w-[720px] flex-col items-center px-5 py-32 text-center">
+        <Eyebrow tone="maroon">{n.code}</Eyebrow>
+        <h1 className="mt-4 font-display text-[clamp(2rem,5vw,3.2rem)] font-semibold leading-tight text-ink">{n.title}</h1>
+        <p className="prose-col mt-5 font-body text-muted">{n.body}</p>
+        <PrimaryButton to="/" className="mt-8">{t.common.backHome}</PrimaryButton>
+      </div>
+    </section>
+  );
+}

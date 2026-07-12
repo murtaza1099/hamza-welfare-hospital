@@ -1,0 +1,17 @@
+import { Eyebrow, Reveal } from "./ui";
+
+export default function PageHeader({ eyebrow, title, intro }) {
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto max-w-[1200px] px-5 pb-4 pt-14 md:pt-20">
+        <Reveal>
+          <Eyebrow tone="maroon">{eyebrow}</Eyebrow>
+          <h1 className="mt-4 max-w-4xl font-display text-[clamp(2.1rem,5vw,3.6rem)] font-medium leading-[1.1] text-ink">
+            {title}
+          </h1>
+          {intro && <p className="prose-col mt-6 font-body text-[18px] leading-relaxed text-muted">{intro}</p>}
+        </Reveal>
+      </div>
+    </section>
+  );
+}

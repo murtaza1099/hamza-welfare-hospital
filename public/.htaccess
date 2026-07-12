@@ -1,0 +1,50 @@
+# Hamza Welfare Hospital — Apache config for Hostinger web hosting.
+# Handles single-page-app routing: any URL that isn't a real file or the
+# PHP handler is served by index.html so React Router can take over.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Let real files (JS, CSS, images) and the PHP endpoint through untouched.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Everything else → index.html (client-side routing).
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Gzip compression for faster loading.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Cache static assets aggressively (they are content-hashed by the build).
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Security headers.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  # HSTS (enable once HTTPS is confirmed working on your domain):
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Block access to sensitive files.
+<FilesMatch "(^\.|\.(env|md|json|lock)$)">
+  Require all denied
+</FilesMatch>
+
+# Don't list directory contents.
+Options -Indexes

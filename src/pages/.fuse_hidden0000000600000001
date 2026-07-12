@@ -1,0 +1,387 @@
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { Phone, ArrowRight, MapPin, HandHeart } from "lucide-react";
+import { useLang } from "../context/LanguageContext";
+import { useSeo } from "../hooks/useSeo";
+import { serviceItems } from "../data/services";
+import CountUp from "../components/CountUp";
+import AyahMarquee from "../components/AyahMarquee";
+import ServiceCard from "../components/ServiceCard";
+import {
+  ImageSlot,
+  Reveal,
+  Eyebrow,
+  DoubleRule,
+  DonateButton,
+  OutlineButton,
+  PrimaryButton,
+} from "../components/ui";
+
+function Hero() {
+  const { t } = useLang();
+  const reduce = useReducedMotion();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 60]);
+
+  const words = t.home.heroTitle.split(" ");
+
+  const container = { hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } };
+  const item = {
+    hidden: reduce ? { opacity: 0 } : { opacity: 0, y: 24 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
+
+  return (
+    <section ref={ref} className="grain relative overflow-hidden bg-cream">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 pb-8 pt-12 md:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+        <motion.div variants={container} initial="hidden" animate="show" className="text-center lg:text-start">
+          <motion.p variants={item} className="eyebrow text-maroon">
+            {t.home.heroEyebrow}
+          </motion.p>
+          <h1 className="mt-4 font-display text-[clamp(2.4rem,6vw,4.4rem)] font-semibold leading-[1.08] text-ink">
+            {words.map((w, i) => (
+              <motion.span key={i} variants={item} className="inline-block ltr:mr-[0.25em] rtl:ml-[0.25em]">
+                {w}
+              </motion.span>
+            ))}
+          </h1>
+          <motion.p variants={item} className="prose-col mx-auto mt-6 font-body text-[18px] leading-relaxed text-muted lg:mx-0">
+            {t.home.heroSub}
+          </motion.p>
+          <motion.div variants={item} className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+            <DonateButton>{t.common.donateNow}</DonateButton>
+            <OutlineButton to="/appointment">{t.common.bookAppointment}</OutlineButton>
+          </motion.div>
+        </motion.div>
+
+        <motion.div style={{ y }} className="relative">
+          <div className="absolute -inset-3 -z-0 hidden rounded-2xl bg-sagetint sm:block ltr:translate-x-4 ltr:translate-y-4 rtl:-translate-x-4 rtl:translate-y-4" aria-hidden="true" />
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.35 }}
+            className="relative"
+          >
+            <ImageSlot
+              src="hero-building.jpg"
+              ratio="4/3"
+              alt="Hamza Welfare Hospital building exterior on Simly Dam Road, Pind Begwal, near Islamabad"
+              rounded="rounded-2xl"
+            />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function Stats() {
+  const { t } = useLang();
+  const h = t.home;
+  const stats = [
+    { num: h.stat1Num, suffix: h.stat1Suffix, label: h.stat1Label },
+    { num: h.stat2Num, suffix: h.stat2Suffix, label: h.stat2Label },
+    { num: h.stat3Num, suffix: h.stat3Suffix, label: h.stat3Label },
+    { num: h.stat4Num, suffix: h.stat4Suffix, prefix: h.stat4Prefix, label: h.stat4Label },
+  ];
+  return (
+    <section className="grain bg-cream2">
+      <div className="mx-auto max-w-[1100px] px-5 py-16 md:py-20">
+        <div className="grid grid-cols-2 gap-y-10 lg:grid-cols-4 lg:divide-x lg:divide-hair rtl:lg:divide-x-reverse">
+          {stats.map((s, i) => (
+            <Reveal key={i} delay={i * 0.08} className="px-4 text-center">
+              <div className="font-display text-[clamp(2rem,4.2vw,2.9rem)] font-medium leading-none tracking-tight text-forest">
+                <CountUp value={s.num} prefix={s.prefix || ""} suffix={s.suffix || ""} />
+              </div>
+              <div className="mx-auto mt-2.5 h-[2px] w-9 bg-maroon" />
+              <p className="mx-auto mt-2.5 max-w-[15ch] font-body text-[13.5px] leading-snug text-muted">{s.label}</p>
+            </Reveal>
+          ))}
+        </div>
+        <p className="mt-10 text-center font-body text-[12.5px] italic text-muted/90">{h.statsCaption}</p>
+      </div>
+    </section>
+  );
+}
+
+// Split-section heading column: heading is centered within its own half,
+// sitting opposite the body/content column. Stacks cleanly on mobile.
+function SectionHeading({ eyebrow, eyebrowTone = "sage", title, body, cta, children, align = "center" }) {
+  return (
+    <div className={`flex h-full flex-col justify-center ${align === "center" ? "text-center" : ""}`}>
+      <Reveal>
+        {eyebrow && <Eyebrow tone={eyebrowTone}>{eyebrow}</Eyebrow>}
+        <h2 className="mt-4 font-display text-[clamp(1.9rem,4vw,2.8rem)] font-semibold leading-tight text-ink">
+          {title}
+        </h2>
+        {body && <p className="prose-col mx-auto mt-5 font-body text-muted">{body}</p>}
+        {children}
+        {cta}
+      </Reveal>
+    </div>
+  );
+}
+
+function ServicesOverview() {
+  const { t } = useLang();
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto max-w-[1200px] px-5 py-section">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <Eyebrow>{t.home.servicesEyebrow}</Eyebrow>
+          <h2 className="mt-4 font-display text-[clamp(1.9rem,4vw,2.8rem)] font-medium leading-tight text-ink">
+            {t.home.servicesTitle}
+          </h2>
+          <p className="mx-auto mt-5 font-body text-muted">{t.home.servicesIntro}</p>
+        </Reveal>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {serviceItems.map((item, i) => (
+            <Reveal key={item.key} delay={(i % 4) * 0.06}>
+              <ServiceCard item={item} />
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 font-body font-semibold text-forest transition-all hover:gap-3"
+          >
+            {t.servicesPage.title}
+            <ArrowRight size={18} className="rtl:rotate-180" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Patients photo band — a warm collage of real patient photos.
+function PatientsBand() {
+  const { t } = useLang();
+  return (
+    <section className="bg-cream2">
+      <div className="mx-auto max-w-[1200px] px-5 py-section">
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <SectionHeading
+            eyebrow={t.home.patientsEyebrow}
+            eyebrowTone="maroon"
+            title={t.home.patientsTitle}
+            body={t.home.patientsBody}
+          />
+          <Reveal delay={0.1}>
+            <div className="grid grid-cols-2 grid-rows-2 gap-3 sm:gap-4">
+              <ImageSlot src="patient-01.jpg" fill alt="A patient being treated at Hamza Welfare Hospital, Pind Begwal" rounded="rounded-xl" className="row-span-2" />
+              <ImageSlot src="patient-02.jpg" ratio="4/3" alt="A child receiving free medical care at the hospital" rounded="rounded-xl" />
+              <ImageSlot src="patient-03.jpg" ratio="4/3" alt="A family at the Hamza Welfare Hospital reception" rounded="rounded-xl" />
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NijatStrip() {
+  const { t } = useLang();
+  return (
+    <section className="bg-forest text-cream">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 py-section lg:grid-cols-2 lg:gap-16">
+        <Reveal>
+          <ImageSlot
+            src="nijat-care.jpg"
+            ratio="16/9"
+            alt="Nijat Palliative Cancer Care at Hamza Welfare Hospital"
+            rounded="rounded-2xl"
+          />
+        </Reveal>
+        <div className="flex h-full flex-col justify-center text-center lg:text-start">
+          <Reveal delay={0.1}>
+            <Eyebrow tone="sage" className="text-cream/70">{t.home.nijatEyebrow}</Eyebrow>
+            <h2 className="mt-4 font-display text-[clamp(1.9rem,4vw,2.7rem)] font-semibold leading-tight">
+              {t.home.nijatTitle}
+            </h2>
+            <p className="prose-col mx-auto mt-5 font-body text-[16.5px] leading-relaxed text-cream/85 lg:mx-0">{t.home.nijatBody}</p>
+            <DonateButton to="/doctors" className="mt-7">{t.common.learnMore}</DonateButton>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const { t } = useLang();
+  const steps = [
+    { n: "01", title: t.home.howStep1Title, body: t.home.howStep1Body },
+    { n: "02", title: t.home.howStep2Title, body: t.home.howStep2Body },
+    { n: "03", title: t.home.howStep3Title, body: t.home.howStep3Body },
+  ];
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto max-w-[1200px] px-5 py-section">
+        <Reveal className="text-center">
+          <Eyebrow>{t.home.howEyebrow}</Eyebrow>
+          <h2 className="mt-4 font-display text-[clamp(1.9rem,4vw,2.8rem)] font-semibold text-ink">{t.home.howTitle}</h2>
+        </Reveal>
+        <div className="mt-12 grid gap-10 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.1} className="text-center md:text-start">
+              <div className="font-display text-[3.5rem] font-semibold leading-none text-sage/70">{s.n}</div>
+              <h3 className="mt-3 font-display text-[22px] font-semibold text-forest">{s.title}</h3>
+              <p className="mt-2 font-body text-[15px] leading-relaxed text-muted">{s.body}</p>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.2}>
+          <p className="mx-auto mt-14 max-w-3xl border-t border-hair pt-8 text-center font-display text-[clamp(1.2rem,2.6vw,1.6rem)] italic leading-relaxed text-ink">
+            {t.home.howClosing}
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// Second charity hook — sage-toned, verse-inspired, distinct from the maroon band.
+function CharityHook() {
+  const { t } = useLang();
+  return (
+    <section className="grain bg-sagetint">
+      <div className="mx-auto max-w-[1000px] px-5 py-section text-center">
+        <Reveal>
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-forest text-cream">
+            <HandHeart size={26} />
+          </span>
+          <Eyebrow tone="maroon" className="mt-6">{t.home.hook2Eyebrow}</Eyebrow>
+          <h2 className="mx-auto mt-4 max-w-3xl font-display text-[clamp(1.8rem,4vw,2.7rem)] font-semibold leading-tight text-ink">
+            {t.home.hook2Title}
+          </h2>
+          <p className="prose-col mx-auto mt-5 font-body text-[17px] text-muted">{t.home.hook2Body}</p>
+          <DonateButton className="mt-8">{t.home.hook2Cta}</DonateButton>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Story() {
+  const { t } = useLang();
+  return (
+    <section className="bg-cream2">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-10 px-5 py-section lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+        <div className="flex h-full flex-col justify-center">
+          <Reveal>
+            <Eyebrow tone="maroon">{t.home.storyEyebrow}</Eyebrow>
+            <blockquote className="mt-6 ltr:border-l-4 rtl:border-r-4 border-maroon ltr:pl-6 rtl:pr-6">
+              <p className="font-display text-[clamp(1.5rem,3.4vw,2.2rem)] font-medium leading-[1.35] text-ink">
+                “{t.home.storyQuote}”
+              </p>
+            </blockquote>
+          </Reveal>
+        </div>
+        <Reveal delay={0.1}>
+          <div className="rounded-2xl bg-[#efe7da] p-3 shadow-card ring-1 ring-[#d8c9ae]">
+            <ImageSlot
+              src="about-history.jpg"
+              ratio="3/4"
+              alt="Hamza Welfare Hospital's first building in Islamabad, founded 2002"
+              rounded="rounded-xl"
+              className="[&_img]:sepia-[0.25]"
+            />
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function DonateBand() {
+  const { t } = useLang();
+  return (
+    <section className="bg-maroon text-cream">
+      <div className="mx-auto max-w-[1000px] px-5 py-section text-center">
+        <Reveal>
+          <h2 className="mx-auto max-w-3xl font-display text-[clamp(1.8rem,4vw,2.8rem)] font-semibold leading-tight">
+            {t.home.donateBandTitle}
+          </h2>
+          <p className="prose-col mx-auto mt-5 font-body text-[16.5px] text-cream/85">{t.home.donateBandSub}</p>
+          <OutlineButton to="/donate" tone="cream" className="mt-8">{t.common.donateNow}</OutlineButton>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function FinalStrip() {
+  const { t } = useLang();
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto grid max-w-[1200px] items-center gap-8 px-5 py-section lg:grid-cols-2 lg:gap-14">
+        <div className="flex h-full flex-col justify-center text-center lg:text-start">
+          <Reveal>
+            <Eyebrow>{t.nav.contact}</Eyebrow>
+            <h2 className="mt-4 font-display text-[clamp(1.8rem,4vw,2.6rem)] font-semibold text-ink">{t.home.finalTitle}</h2>
+            <p className="mt-4 font-body text-muted">{t.home.finalSub}</p>
+            <div className="mx-auto mt-6 max-w-md space-y-3 font-body text-[15px] text-ink/85 lg:mx-0">
+              <p className="flex items-center justify-center gap-3 lg:justify-start"><MapPin size={18} className="shrink-0 text-forest" /> {t.common.address}</p>
+              <p className="flex items-center justify-center gap-3 lg:justify-start" dir="ltr"><Phone size={18} className="shrink-0 text-forest" /> 0333 5115038</p>
+            </div>
+            <div className="mt-7 flex flex-wrap justify-center gap-3 lg:justify-start">
+              <PrimaryButton to="/contact">{t.nav.contact}</PrimaryButton>
+              <a
+                href="https://wa.me/923335115038"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-forest px-6 py-3 font-body font-semibold text-forest transition-all hover:bg-forest hover:text-cream"
+              >
+                {t.common.whatsapp}
+              </a>
+            </div>
+          </Reveal>
+        </div>
+        <Reveal delay={0.1}>
+          <div className="overflow-hidden rounded-2xl border border-hair">
+            <iframe
+              title={t.contactPage.mapTitle}
+              src="https://www.google.com/maps?q=Simly%20Dam%20Road%20Fazaiya%20Chowk%20Islamabad&output=embed"
+              className="h-[320px] w-full"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+export default function Home() {
+  const { t, lang } = useLang();
+  useSeo(
+    lang === "ur"
+      ? "حمزہ ویلفیئر ہسپتال — پنڈ بیگوال، اسلام آباد میں مفت و رعایتی علاج"
+      : "Hamza Welfare Hospital — Free & Subsidized Healthcare in Pind Begwal, Islamabad",
+    t.home.heroSub
+  );
+
+  return (
+    <>
+      <Hero />
+      <AyahMarquee />
+      <Stats />
+      <ServicesOverview />
+      <PatientsBand />
+      <NijatStrip />
+      <HowItWorks />
+      <CharityHook />
+      <DoubleRule />
+      <Story />
+      <DonateBand />
+      <FinalStrip />
+    </>
+  );
+}

@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Lighter, more elegant display headings (Fraunces optical sizing).
+   Softens any remaining bold weights so headings read refined, not heavy. */
+@layer base {
+  .font-display {
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+  }
+  h1.font-display,
+  h2.font-display,
+  h3.font-display {
+    font-weight: 500;
+  }
+}
+
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: #faf7f2;
+  color: #22271f;
+  font-family: "Public Sans", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Paper grain overlay for cream sections */
+.grain {
+  position: relative;
+}
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  background-size: 180px 180px;
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+.grain > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Urdu / RTL typography — Nastaliq needs tall line-height */
+[dir="rtl"] {
+  font-family: "Noto Nastaliq Urdu", serif;
+}
+[dir="rtl"] body,
+[dir="rtl"] p,
+[dir="rtl"] li,
+[dir="rtl"] a,
+[dir="rtl"] span,
+[dir="rtl"] label,
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select,
+[dir="rtl"] button {
+  font-family: "Noto Nastaliq Urdu", serif;
+  line-height: 2.1;
+}
+[dir="rtl"] .font-display,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4 {
+  font-family: "Noto Nastaliq Urdu", serif;
+  line-height: 2.0;
+}
+/* Urdu headings a touch smaller since Nastaliq reads tall */
+[dir="rtl"] h1 {
+  font-size: clamp(2rem, 5vw, 3.6rem);
+}
+[dir="rtl"] .eyebrow {
+  letter-spacing: 0;
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-family: "Public Sans", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Editorial double rule divider */
+.rule-double {
+  border: 0;
+  border-top: 1px solid #588c6b;
+  border-bottom: 1px solid #588c6b;
+  height: 4px;
+  opacity: 0.55;
+}
+
+/* Tabular numerals for stats */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Focus ring — accessible green */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #0f5929;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Kill motion for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Prose paragraph width */
+.prose-col p {
+  max-width: 68ch;
+}
+[dir="rtl"] .prose-col p {
+  margin-left: auto;
+}
+
+/* Custom select arrow reset */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Lightbox no-scroll */
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Arabic (Quranic) type for the ayah */
+.font-arabic {
+  font-family: "Amiri", serif;
+  line-height: 1.9;
+}
+
+/* Infinite marquee — seamless loop with two duplicated tracks */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 32s linear infinite;
+}
+[dir="rtl"] .marquee {
+  animation-direction: reverse;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+    justify-content: center;
+    width: 100%;
+  }
+}

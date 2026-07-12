@@ -1,0 +1,140 @@
+import { useState } from "react";
+import { useLang } from "../context/LanguageContext";
+import { useSeo } from "../hooks/useSeo";
+import PageHeader from "../components/PageHeader";
+import { DoubleRule, PrimaryButton, Reveal, Eyebrow } from "../components/ui";
+import { Field, TextInput, TextArea, Select, SuccessPanel, validatePhone, Honeypot } from "../components/FormBits";
+import { submitDonation } from "../lib/submissions";
+
+const countries = ["Pakistan", "United Kingdom", "United States", "Saudi Arabia", "UAE", "Canada", "Australia", "Other"];
+
+function GivingLevels() {
+  const { t } = useLang();
+  const d = t.donatePage;
+  const levels = [
+    { amt: d.level1, body: d.level1Body },
+    { amt: d.level2, body: d.level2Body },
+    { amt: d.level3, body: d.level3Body },
+    { amt: d.customLevel, body: d.customBody },
+  ];
+  return (
+    <section className="grain bg-cream">
+      <div className="mx-auto max-w-[1200px] px-5 py-section">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {levels.map((l, i) => (
+            <Reveal key={i} delay={i * 0.06}>
+              <div className="flex h-full flex-col rounded-2xl border border-hair bg-cream/60 p-6">
+                <span className="font-display text-[26px] font-medium text-forest" dir="ltr">{l.amt}</span>
+                <span className="mt-2 h-[3px] w-10 bg-maroon" />
+                <p className="mt-3 font-body text-[14.5px] leading-relaxed text-muted">{l.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={0.1}>
+          <p className="prose-col mt-10 border-t border-hair pt-8 font-body text-[15px] italic text-muted">{d.zakatNote}</p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+export default function Donate() {
+  const { t, lang } = useLang();
+  const d = t.donatePage;
+  useSeo(t.seo.donateTitle, t.seo.donateDesc);
+
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    country: "Pakistan",
+    donationType: d.types[0],
+    amount: "",
+    message: "",
+    website: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState("idle");
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const validate = () => {
+    const err = {};
+    if (!form.fullName.trim()) err.fullName = t.forms.required;
+    if (!form.phone.trim()) err.phone = t.forms.required;
+    else if (!validatePhone(form.phone)) err.phone = t.forms.invalidPhone;
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setStatus("submitting");
+    const res = await submitDonation(form, lang);
+    setStatus(res.ok ? "success" : "error");
+  };
+
+  return (
+    <>
+      <PageHeader eyebrow={d.eyebrow} title={d.title} intro={d.intro} />
+      <DoubleRule />
+      <GivingLevels />
+
+      <section className="bg-cream2">
+        <div className="mx-auto max-w-[720px] px-5 py-section">
+          {status === "success" ? (
+            <SuccessPanel title={d.successTitle} body={d.successBody} />
+          ) : (
+            <Reveal>
+              <Eyebrow tone="maroon">{d.pledgeTitle}</Eyebrow>
+              <p className="prose-col mt-3 font-body text-muted">{d.pledgeIntro}</p>
+              <form onSubmit={onSubmit} noValidate className="relative mt-8 grid gap-5 rounded-2xl border border-hair bg-cream/60 p-6 sm:p-8">
+                <Honeypot value={form.website} onChange={set("website")} />
+                <Field label={d.fullName} required error={errors.fullName}>
+                  <TextInput value={form.fullName} onChange={set("fullName")} error={errors.fullName} autoComplete="name" />
+                </Field>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label={d.phone} required error={errors.phone}>
+                    <TextInput value={form.phone} onChange={set("phone")} error={errors.phone} inputMode="tel" placeholder="03XX-XXXXXXX" dir="ltr" />
+                  </Field>
+                  <Field label={d.email} optionalText={t.forms.optional}>
+                    <TextInput type="email" value={form.email} onChange={set("email")} dir="ltr" autoComplete="email" />
+                  </Field>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label={d.country}>
+                    <Select value={form.country} onChange={set("country")}>
+                      {countries.map((c) => <option key={c}>{c}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label={d.donationType}>
+                    <Select value={form.donationType} onChange={set("donationType")}>
+                      {d.types.map((c) => <option key={c}>{c}</option>)}
+                    </Select>
+                  </Field>
+                </div>
+                <Field label={d.amount} optionalText={t.forms.optional}>
+                  <TextInput value={form.amount} onChange={set("amount")} inputMode="numeric" dir="ltr" />
+                </Field>
+                <Field label={d.message} optionalText={t.forms.optional}>
+                  <TextArea value={form.message} onChange={set("message")} />
+                </Field>
+
+                {status === "error" && (
+                  <p className="rounded-lg bg-maroon/10 px-4 py-3 font-body text-[14px] text-maroon">{t.forms.networkError}</p>
+                )}
+
+                <PrimaryButton type="submit" className="w-full sm:w-auto">
+                  {status === "submitting" ? d.submitting : d.submit}
+                </PrimaryButton>
+                <p className="font-body text-[13px] text-muted">{d.privacy}</p>
+              </form>
+            </Reveal>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}
