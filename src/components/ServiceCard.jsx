@@ -26,7 +26,7 @@ export default function ServiceCard({ item }) {
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-5">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-5 text-center">
         <h3 className="font-display text-[19px] font-medium text-ink">{t.services[key].title}</h3>
         <p className="mt-2 font-body text-[14.5px] leading-relaxed text-muted">{t.services[key].desc}</p>
       </div>
