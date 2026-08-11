@@ -23,6 +23,8 @@ export const translations = {
       contact: "Contact",
       donate: "Donate",
       book: "Book Appointment",
+      login: "Login",
+      loginAria: "Login to the Hamza Welfare Hospital patient system",
     },
 
     common: {
@@ -448,6 +450,8 @@ export const translations = {
       contact: "رابطہ",
       donate: "عطیہ کریں",
       book: "اپائنٹمنٹ بک کریں",
+      login: "لاگ اِن",
+      loginAria: "حمزہ ویلفیئر ہسپتال کے مریض سسٹم میں لاگ اِن کریں",
     },
 
     common: {

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn } from "lucide-react";
 import { useLang } from "../context/LanguageContext";
 import BrandLogo from "./BrandLogo";
+import { HMS_URL, hmsLinkProps } from "../config/hms";
 
 function LangToggle({ className = "" }) {
   const { lang, toggleLang, t } = useLang();
@@ -137,17 +138,30 @@ export default function Header() {
             >
               {t.nav.donate}
             </Link>
-            <Link
-              to="/appointment"
-              className="inline-flex items-center rounded-full border-2 border-forest px-4 py-2 font-body text-[14px] font-semibold text-forest transition-all hover:bg-forest hover:text-cream"
+            <a
+              href={HMS_URL}
+              {...hmsLinkProps}
+              aria-label={t.nav.loginAria}
+              className="inline-flex items-center gap-2 rounded-full border-2 border-forest px-4 py-2 font-body text-[14px] font-semibold text-forest transition-all hover:bg-forest hover:text-cream"
             >
-              {t.nav.book}
-            </Link>
+              <LogIn size={16} aria-hidden="true" />
+              {t.nav.login}
+            </a>
           </div>
 
           {/* Mobile controls */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden">
             <LangToggle />
+            {/* Always visible on phones — patients reach the system without opening the menu */}
+            <a
+              href={HMS_URL}
+              {...hmsLinkProps}
+              aria-label={t.nav.loginAria}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-forest px-3 py-2 font-body text-[13px] font-semibold leading-none text-cream shadow-sm transition-transform active:scale-95 sm:px-4"
+            >
+              <LogIn size={14} aria-hidden="true" />
+              {t.nav.login}
+            </a>
             <button
               onClick={() => setOpen(true)}
               aria-label="Open menu"
@@ -210,9 +224,15 @@ export default function Header() {
                 <Link to="/donate" className="rounded-full bg-maroon px-5 py-3 text-center font-body font-semibold text-cream">
                   {t.nav.donate}
                 </Link>
-                <Link to="/appointment" className="rounded-full border-2 border-forest px-5 py-3 text-center font-body font-semibold text-forest">
-                  {t.nav.book}
-                </Link>
+                <a
+                  href={HMS_URL}
+                  {...hmsLinkProps}
+                  aria-label={t.nav.loginAria}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-forest px-5 py-3 text-center font-body font-semibold text-forest"
+                >
+                  <LogIn size={18} aria-hidden="true" />
+                  {t.nav.login}
+                </a>
               </div>
             </motion.aside>
           </>

@@ -1,0 +1,7 @@
+# Never upload these to Vercel — belt and braces alongside the send.php move.
+legacy-hostinger
+*.php
+node_modules
+dist
+.stage
+*.log
